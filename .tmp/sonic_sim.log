@@ -1,0 +1,6 @@
+[SONIC sim] starting MuJoCo sim loop...
+[SONIC sim] MUJOCO_GL=egl
+[SONIC sim] viewer enabled=False
+[SONIC sim] loading WBC config...
+[SONIC sim] domain_id=0 interface=lo
+1785666500.134581 [0]     python: selected interface "lo" is not multicast-capable: disabling multicast

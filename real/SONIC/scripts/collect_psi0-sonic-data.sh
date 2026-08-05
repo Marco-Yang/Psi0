@@ -30,7 +30,7 @@ if [ "$MODE" = "sim" ]; then
     tmux new-session -d -s "$SESSION" -c "$SONIC_DIR"
     tmux set-option -t "$SESSION" -g mouse on   # click a pane to focus it (e.g. to press Y in the deploy pane)
     tmux send-keys -t "${SESSION}:0.0" \
-        "source .venv_teleop/bin/activate && python gear_sonic/scripts/run_sim_loop.py" C-m
+        "export MUJOCO_GL=egl && source .venv_teleop/bin/activate && python gear_sonic/scripts/run_sim_loop.py" C-m
 
     tmux split-window -h -t "${SESSION}:0.0" -c "$SONIC_DIR/gear_sonic_deploy"
     tmux send-keys -t "${SESSION}:0.1" \

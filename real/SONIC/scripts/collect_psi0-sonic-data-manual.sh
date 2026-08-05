@@ -22,8 +22,11 @@ cd "$SONIC_DIR"
 
 case "$1" in
     sim)
+        export MUJOCO_GL=egl
+        export PYOPENGL_PLATFORM=egl
         source .venv_teleop/bin/activate
-        python gear_sonic/scripts/run_sim_loop.py
+        echo "[manual] starting SONIC sim loop (headless smoke test)"
+        PYTHONUNBUFFERED=1 python -u gear_sonic/scripts/run_sim_loop.py
         ;;
     deploy)
         cd gear_sonic_deploy

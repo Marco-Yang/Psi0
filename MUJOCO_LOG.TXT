@@ -1,0 +1,34 @@
+ERROR Mon Aug  3 17:12:58 2026: could not initialize GLFW
+
+ERROR Mon Aug  3 17:13:16 2026: could not initialize GLFW
+
+ERROR Mon Aug  3 17:21:48 2026: could not initialize GLFW
+
+WARNING Tue Aug  4 15:52:49 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 16M bytes. Time = 0.0000.
+
+WARNING Tue Aug  4 16:58:05 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Tue Aug  4 17:01:04 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Tue Aug  4 18:17:33 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+ERROR Tue Aug  4 18:57:38 2026: could not initialize GLFW
+
+WARNING Tue Aug  4 18:57:53 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Tue Aug  4 20:50:06 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Wed Aug  5 10:34:54 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Wed Aug  5 10:43:55 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Wed Aug  5 11:00:08 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Wed Aug  5 11:00:31 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Wed Aug  5 11:00:58 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Wed Aug  5 11:03:48 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+
+WARNING Wed Aug  5 11:04:14 2026: Insufficient arena memory for the number of constraints generated. Increase arena memory allocation above 17M bytes. Time = 0.0000.
+

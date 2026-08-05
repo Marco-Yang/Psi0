@@ -1,21 +1,47 @@
+import sys
+from pathlib import Path
+
 import numpy as np
 import time
 from scipy.spatial.transform import Rotation as R
-import xrobotoolkit_sdk as xrt 
 
-from constants_vuer import (
-    T_robot_openxr,
-    T_to_unitree_hand,
-    grd_yup2grd_zup,
-    hand2inspire,
-    hand2inspire_l_arm,
-    hand2inspire_l_finger,
-    hand2inspire_r_arm,
-    hand2inspire_r_finger,
-)
-from motion_utils import fast_mat_inv, mat_update
+TELEOP_ROOT = Path(__file__).resolve().parent
+if str(TELEOP_ROOT) not in sys.path:
+    sys.path.insert(0, str(TELEOP_ROOT))
 
-from robot_control.hand_retargeting import HandRetargeting, HandType
+try:
+    import xrobotoolkit_sdk as xrt
+except Exception:
+    xrt = None
+
+try:
+    from constants_vuer import (
+        T_robot_openxr,
+        T_to_unitree_hand,
+        grd_yup2grd_zup,
+        hand2inspire,
+        hand2inspire_l_arm,
+        hand2inspire_l_finger,
+        hand2inspire_r_arm,
+        hand2inspire_r_finger,
+    )
+    from motion_utils import fast_mat_inv, mat_update
+    from robot_control.hand_retargeting import HandRetargeting, HandType
+    _RETARGET_IMPORT_ERROR = None
+except Exception as exc:
+    T_robot_openxr = np.eye(4)
+    T_to_unitree_hand = np.eye(4)
+    grd_yup2grd_zup = np.eye(4)
+    hand2inspire = np.eye(4)
+    hand2inspire_l_arm = np.eye(4)
+    hand2inspire_l_finger = np.eye(4)
+    hand2inspire_r_arm = np.eye(4)
+    hand2inspire_r_finger = np.eye(4)
+    fast_mat_inv = lambda x: x
+    mat_update = lambda cur, new: new if new is not None else cur
+    HandRetargeting = None
+    HandType = None
+    _RETARGET_IMPORT_ERROR = exc
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -61,10 +87,16 @@ class PicoReceiver:
             [ 0, -1,  0,  0],
             [ 0,  0,  0,  1]
         ])
+        self.available = False
+
+        if xrt is None:
+            print("[PICO] xrobotoolkit_sdk is not available; running in disabled mode")
+            return
 
         try:
             print("[PICO] Initializing PICO SDK...")
             xrt.init()
+            self.available = True
             print("[PICO] PICO SDK Initialized successfully")
         except Exception as e:
             print(f"[PICO] Init Failed: {e}")
@@ -72,6 +104,9 @@ class PicoReceiver:
 
 
     def get_latest_matrices(self):
+        if not self.available:
+            return None, None, None, np.zeros((0, 3)), np.zeros((0, 3))
+
         # 1. Get Head Pose (7-dim)
         head_pose = xrt.get_headset_pose()
 
@@ -92,7 +127,8 @@ class PicoReceiver:
         
 
     def stop(self):
-        xrt.close()
+        if xrt is not None and self.available:
+            xrt.close()
 
 
 class VuerPreprocessor:
@@ -109,7 +145,11 @@ class VuerPreprocessor:
             [[1, 0, 0, -0.5], [0, 1, 0, 1], [0, 0, 1, -0.5], [0, 0, 0, 1]]
         )
 
-        self.hand_retargeting = HandRetargeting(HandType.UNITREE_DEX3)
+        self.hand_retargeting = None
+        if HandRetargeting is not None and HandType is not None:
+            self.hand_retargeting = HandRetargeting(HandType.UNITREE_DEX3)
+        else:
+            print("[PICO] Hand retargeting unavailable; using disabled mode")
 
         self.y_offset = None
         # Only adjust this parameter if g1's pelvis height is too higher or too lower than expected.
@@ -123,6 +163,9 @@ class VuerPreprocessor:
     
     def process(self):
         p_head, p_left, p_right, p_left_hand, p_right_hand = self.pico_receiver.get_latest_matrices()
+        if p_head is None:
+            return None, None, None, None, None
+
         head_mat = mat_update(self.vuer_head_mat, p_head)
 
         if self.calibration_enabled and head_mat is not None and self.y_offset is None:
@@ -184,7 +227,7 @@ class VuerPreprocessor:
         # Check if hand data is initialized
         left_q_target, right_q_target = None, None
 
-        if not np.all(left_hand_mat == 0.0):
+        if self.hand_retargeting is not None and not np.all(left_hand_mat == 0.0):
             # Extract the relevant tip indices (assumed defined elsewhere)
             ref_left_value = unitree_left_hand[unitree_tip_indices].copy()
             ref_right_value = unitree_right_hand[unitree_tip_indices].copy()
@@ -229,6 +272,9 @@ class PicoTeleop:
         head_mat, left_wrist_mat, right_wrist_mat, left_hand_q, right_hand_q = (
             self.processor.process()
         )
+
+        if head_mat is None:
+            return None, None, None, None, None
 
         if full_head:
             head_rmat = head_mat
